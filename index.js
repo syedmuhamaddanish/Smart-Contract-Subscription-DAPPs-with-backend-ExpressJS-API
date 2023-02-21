@@ -7,17 +7,19 @@ app.use(express.static(__dirname));
 const ethers = require('ethers');
 const path = require('path');
 
+// Serves the index.html file
 app.get("/", (req, res) => {
     res.sendFile(path.join(__dirname, "index.html"));
 });
 
 // Function to define the API call from Redis
 async function getSubscriberData(req, res) {
-    var user = req.query.address;
-    console.log(user)  //Search corresponding IPFS hash from a certain date
-    let answer = false;    //Variable to see if the result is from Cache or not
 
-      // initializing blockchain to call smart contract function to retreive IPFS hash
+    var user = req.query.address; //Get address parameter from the query
+    console.log(user)  
+    let answer = false;    //Variable to see if the user is subscribed or not
+
+      // initializing blockchain to call smart contract function 
         const API_URL = process.env.API_URL;
         const PRIVATE_KEY = process.env.PRIVATE_KEY;
         const CONTRACT_ADDRESS_1 = process.env.CONTRACT_ADDRESS;
@@ -29,10 +31,10 @@ async function getSubscriberData(req, res) {
         //console.log(signer)
         const SubscriptionContract = new ethers.Contract(CONTRACT_ADDRESS_1, abi, signer);
     
-        //Checking if data is already available for certain date and address
+        //Checking if user has subscribed to a service. It returns bool
         answer = await SubscriptionContract.subscriberList(user);
 
-          //Send response to front-end with cached data
+          //Send response to front-end
         res.send({answer});
     }
     
